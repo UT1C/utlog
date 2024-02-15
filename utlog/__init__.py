@@ -44,7 +44,12 @@ def _handle_exception(
     return sys.__excepthook__(exc_type, exc_value, exc_traceback)
 
 
-def configure(debug_files: bool = False, history_length: int = 10):
+def configure(
+    debug_files: bool = False,
+    history_length: int = 10,
+    show_vars: bool = False,
+    **kwargs
+):
     global error_logger
 
     LOGS_PATH.mkdir(exist_ok=True)
@@ -53,12 +58,16 @@ def configure(debug_files: bool = False, history_length: int = 10):
         sink=sys.stdout,
         level="INFO",
         format=FORMAT,
+        diagnose=show_vars,
+        **kwargs
     )
     logger.add(
         sink=LOGS_PATH / FILE_NAME,
         level="INFO",
         format=FILE_FORMAT,
         retention=history_length,
+        diagnose=show_vars,
+        **kwargs
     )
     if debug_files:
         logger.add(
@@ -66,6 +75,8 @@ def configure(debug_files: bool = False, history_length: int = 10):
             level="DEBUG",
             format=FILE_FORMAT,
             retention=history_length,
+            diagnose=show_vars,
+            **kwargs
         )
 
     logging.basicConfig(
